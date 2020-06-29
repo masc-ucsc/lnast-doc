@@ -400,9 +400,8 @@ val = 1023u10bits
 <span class="hljs-keyword">auto</span> idx_target = lnast-&gt;add_child(idx_assign, node_target);
 <span class="hljs-keyword">auto</span> idx_const  = lnast-&gt;add_child(idx_assign, node_const);
 </code></pre>
-<p><img src="source/graphviz/assign_trivial_constant.png" alt="assign">
-An assign node sets the right hand side value to the reference pointed by the left hand side<br>
-of the expression. The left hand side is always a reference. The right hand side is a reference or a constant.</p>
+<p><img src="source/graphviz/assign_trivial_constant.png" alt="assign"><br><br>
+An assign node sets the right hand side <strong>(RHS)</strong> value to the reference pointed by the left hand side <strong>(LHS)</strong> of the expression. The left hand side is always a reference. The right hand side is a reference or a constant.</p>
 <h2 id="assign-simple-expression">Assign Simple Expression</h2>
 <pre class="highlight"><code>// Pyrope
 total := (x - 1) + 3 + 2
@@ -456,8 +455,8 @@ node node_op5    = Lnast_node::create_const     (<span class="hljs-string">"0d2"
 <span class="hljs-keyword">auto</span> idx_lhs3    = lnast-&gt;add_child(idx_assign, node_lhs3);
 <span class="hljs-keyword">auto</span> idx_op6     = lnast-&gt;add_child(idx_assign, node_op6);        
 </code></pre>
-<p><img src="source/graphviz/assign_simple_expression.png" alt="assign">
-statements that have operations must breakdown the operations per type, and then assign the temporal value to the assign node.</p>
+<p><img src="source/graphviz/assign_simple_expression.png" alt="assign"><br><br>
+Statements that have operations must breakdown the operations into specific types, and then assign the temporal value(s) to the assign node.</p>
 <h1 id="unary-operation-statement">Unary Operation Statement</h1>
 <p>Unary operator is embedded as the prefix of the variable string_view</p>
 <h2 id="binary-not-operation">Binary Not Operation</h2>
@@ -480,8 +479,7 @@ statements that have operations must breakdown the operations per type, and then
 </code></pre>
 <p><img src="source/graphviz/inv.png" alt="assign"></p>
 <h2 id="logical-not-operation">Logical Not Operation</h2>
-<p>The not operation can be applied over logical values. Compares the input against zero to be true. The binary not
-just toggles each bit.</p>
+<p>The NOT operation can be applied over logical values. It compares the input against zero to be true. The binary NOT operation just toggles each bit.</p>
 <pre class="highlight"><code>// Pyrope
 %out = !$inp
 </code></pre>
@@ -501,8 +499,8 @@ just toggles each bit.</p>
 </code></pre>
 <p><img src="source/graphviz/logical_inv.png" alt="assign"></p>
 <h1 id="n-ary-operation-statement">N-ary Operation Statement</h1>
-<p>N-ary operation computes n rhs operands and assign the result to the lhs.
-The n-ary operator group includes</p>
+<p>N-ary operations compute <em>n</em> RHS operands and assign the result to the LHS.
+The n-ary operator group includes:</p>
 <table>
 <thead>
 <tr>
@@ -573,7 +571,7 @@ The n-ary operator group includes</p>
 </tr>
 </tbody>
 </table>
-<p>We take the &quot;And Operator&quot; for explaination.</p>
+<p>We take the &quot;And Operator&quot; for further explanation.</p>
 <h2 id="and-operation">And Operation</h2>
 <pre class="highlight"><code>// Pyrope
 out = a &amp; b &amp; c
@@ -640,10 +638,10 @@ out = a &amp; b &amp; c
 <span class="hljs-keyword">auto</span> idx_op5    = lnast-&gt;add_child(idx_assign, Lnast_node::create_ref   (token_f)); <span class="hljs-comment">//string_view = "___b"</span>
 
 </code></pre>
-<p><img src="source/graphviz/simple_if.png" alt="assign">
-An if-subtree consisted of conditional-statements sub-trees, boolean condition nodes, and statements
+<p><img src="source/graphviz/simple_if.png" alt="assign"><br><br>
+An if-subtree consists of conditional-statements sub-trees, boolean condition nodes, and statements
 sub-trees in the following order:</p>
-<p>cstmts1 -&gt; condition1 -&gt; stmts1 -&gt; cstmts2 -&gt; condition2 -&gt; stmts2 ...-&gt; stmtsN,</p>
+<p>cstmts1 -&gt; condition1 -&gt; stmts1 -&gt; cstmts2 -&gt; condition2 -&gt; stmts2 ...-&gt; stmtsN</p>
 <p>If there is a final &quot;else&quot; chunk, it won't come with a corresponding conditionial
 statements sub-tree and conditional node, see the figure for the detail.</p>
 <h2 id="full-case">Full Case</h2>
