@@ -342,6 +342,9 @@ foo = $a
 <pre class="highlight tab tab-verilog"><code><span class="hljs-comment">// Verilog</span>
 <span class="hljs-keyword">input</span> a;
 </code></pre>
+<pre class="highlight tab tab-firrtl"><code><span class="hljs-comment">// FIRRTL</span>
+<span class="hljs-keyword">input</span> a : UInt&#60;1&#62;
+</code></pre>
 <pre class="highlight tab tab-cpp"><code><span class="hljs-comment">// C++</span>
 <span class="hljs-keyword">auto</span> node_input = Lnast_node::create_ref(<span class="hljs-string">"$a"</span>, line_num, pos1, pos2);
 </code></pre>
@@ -352,6 +355,9 @@ foo = $a
 <pre class="highlight tab tab-verilog"><code><span class="hljs-comment">// Verilog</span>
 <span class="hljs-keyword">output</span> out;
 </code></pre>
+<pre class="highlight tab tab-firrtl"><code><span class="hljs-comment">// FIRRTL</span>
+<span class="hljs-keyword">output</span> out : UInt&#60;1&#62;
+</code></pre>
 <pre class="highlight tab tab-cpp"><code><span class="hljs-comment">// C++</span>
 <span class="hljs-keyword">auto</span> node_output = Lnast_node::create_ref(<span class="hljs-string">"%out"</span>, line_num, pos1, pos2);
 </code></pre>
@@ -361,6 +367,9 @@ foo = $a
 </code></pre>
 <pre class="highlight tab tab-verilog"><code><span class="hljs-comment">// Verilog</span>
 <span class="hljs-keyword">reg</span> reg_foo;
+</code></pre>
+<pre class="highlight tab tab-firrtl"><code><span class="hljs-comment">// FIRRTL</span>
+<span class="hljs-keyword">reg</span> reg_foo : UInt, clock
 </code></pre>
 <pre class="highlight tab tab-cpp"><code><span class="hljs-comment">// C++</span>
 <span class="hljs-keyword">auto</span> node_reg = Lnast_node::create_ref(<span class="hljs-string">"#reg_foo"</span>, line_num, pos1, pos2);
@@ -385,6 +394,9 @@ val = 1023u10bits
 <pre class="highlight tab tab-verilog"><code><span class="hljs-comment">// Verilog</span>
 <span class="hljs-keyword">assign</span> val = <span class="hljs-number">10</span><span class="hljs-meta">`d1023 // val has 10 bits</span>
 </code></pre>
+<pre class="highlight tab tab-firrtl"><code><span class="hljs-comment">// FIRRTL</span>
+val &#60;= UInt&#60;10&#62;(1023)
+</code></pre>
 <pre class="highlight tab tab-shell"><code>// CFG
 1       0       0       SEQ0
 2       1       0       0       10      =       val     0d1023u10
@@ -408,6 +420,12 @@ total := (x - 1) + 3 + 2
 </code></pre>
 <pre class="highlight tab tab-verilog"><code><span class="hljs-comment">// Verilog</span>
 <span class="hljs-keyword">assign</span> total = (x - <span class="hljs-number">1</span>) + <span class="hljs-number">3</span> + <span class="hljs-number">2</span>
+</code></pre>
+<pre class="highlight tab tab-firrtl"><code><span class="hljs-comment">// FIRRTL</span>
+node _T   = sub(x, UInt&#60;1&#62;(1))
+node _T_1 = add(_T, UInt&#60;2&#62;(3))
+node _T_2 = add(_T_1, UInt&#60;2&#62;(2))
+total &#60;<= _T_2
 </code></pre>
 <pre class="highlight tab tab-shell"><code>// CFG
 1       0       0       SEQ0
@@ -469,6 +487,12 @@ Statements that have operations must breakdown the operations into specific type
 
 <span class="hljs-keyword">assign</span> out = ~inp;
 </code></pre>
+<pre class="highlight tab tab-firrtl"><code><span class="hljs-comment">// FIRRTL</span>
+<span class="hljs-keyword">input</span>  inp : UInt&#60;1&#62;
+<span class="hljs-keyword">output</span> out : UInt&#60;1&#62;
+
+out &#60;= not(inp)
+</code></pre>
 <pre class="highlight tab tab-shell"><code>1 0 0 SEQ0
 2 1 1 0    10  ~ %out  <span class="hljs-variable">$inp</span>
 </code></pre>
@@ -488,6 +512,12 @@ Statements that have operations must breakdown the operations into specific type
 <span class="hljs-keyword">output</span> <span class="hljs-keyword">wire</span> out;
 
 <span class="hljs-keyword">assign</span> out = !inp;
+</code></pre>
+<pre class="highlight tab tab-firrtl"><code><span class="hljs-comment">// FIRRTL</span>
+<span class="hljs-keyword">input</span>  inp : UInt&#60;1&#62;
+<span class="hljs-keyword">output</span> out : UInt&#60;1&#62;
+
+out <= not(inp)
 </code></pre>
 <pre class="highlight tab tab-shell"><code>1 0 0 SEQ0
 2 1 1 0    10  ! %out  <span class="hljs-variable">$inp</span>
@@ -579,6 +609,11 @@ out = a &amp; b &amp; c
 <pre class="highlight tab tab-verilog"><code><span class="hljs-comment">// Verilog</span>
 <span class="hljs-keyword">assign</span> out = a &amp; b &amp; c
 </code></pre>
+<pre class="highlight tab tab-firrtl"><code><span class="hljs-comment">// FIRRTL</span>
+node _T   = and(a, b)
+node _T_1 = and(_T, c)
+out &#60;= _T_1
+</code></pre>
 <pre class="highlight tab tab-shell"><code>// CFG
 1       0       0       SEQ0
 2       1       0       0       21      &amp;       ___a    a       b      c
@@ -612,7 +647,13 @@ out = a &amp; b &amp; c
 7  6  0  0     24  +   ___b  a     0d1
 8  6  1  0     24  =   a     ___b  
 </code></pre>
-<pre class="highlight tab tab-verilog"><code><span class="hljs-keyword">assign</span> b2 = (a &gt; <span class="hljs-number">3</span>) ? a - <span class="hljs-number">1</span> : b; 
+<pre class="highlight tab tab-verilog"><code><span class="hljs-comment">// Verilog</span>
+<span class="hljs-keyword">assign</span> b2 = (a &gt; <span class="hljs-number">3</span>) ? a - <span class="hljs-number">1</span> : b; 
+</code></pre>
+<pre class="highlight tab tab-firrtl"><code><span class="hljs-comment">// FIRRTL</span>
+node _T   = gt(a, UInt&#lt;2&#gt;(3))
+node _T_1 = add(a, UInt&#lt;1&#gt;(1))
+node _T_2 = validif(_T, _T_1)
 </code></pre>
 <pre class="highlight tab tab-cpp"><code><span class="hljs-comment">//C++ </span>
 
@@ -659,6 +700,16 @@ if a &gt; 10 {
 <span class="hljs-keyword">assign</span> b = (a &gt; <span class="hljs-number">10</span>) ? <span class="hljs-number">3</span> :
            (a &lt; <span class="hljs-number">1</span> ) ? <span class="hljs-number">2</span> : <span class="hljs-number">1</span> ;
 
+</code></pre>
+<pre class="highlight tab tab-firrtl"><code><span class="hljs-comment">// FIRRTL</span>
+node _T   = gt(a, UInt&#lt;4&#gt;(10))
+node _T_1 = lt(a, UInt&#lt;1&#gt;(1))
+when _T :
+  b &#lt;= UInt&#lt;2&#gt;(3)
+else when _T_1 :
+  b &#lt;= UInt&#lt;2&#gt;(2)
+else :
+  b &#lt;= UInt&#lt;1&#gt;(1)
 </code></pre>
 <pre class="highlight tab tab-shell"><code>// CFG 
 1   0   0  SEQ0                       
@@ -728,6 +779,12 @@ tup_t tup;
   tup<span class="hljs-variable">.foo</span> = <span class="hljs-number">1</span>;
   tup<span class="hljs-variable">.bar</span> = cat + <span class="hljs-number">2</span>;
 <span class="hljs-keyword">end</span>
+</code></pre>
+<pre class="highlight tab tab-firrtl"><code><span class="hljs-comment">// FIRRTL</span>
+wire tup : {foo : UInt, bar : UInt}
+tup.foo &#lt;= UInt&#lt;1&#gt;(1)
+node _T = cat + UInt&#lt;2&#gt;(2)
+tup.bar &#lt;= _T
 </code></pre>
 <pre class="highlight tab tab-shell"><code>// CFG 
 // FIXME: SH: <span class="hljs-built_in">wait</span> Akash to change tuple expression scope
