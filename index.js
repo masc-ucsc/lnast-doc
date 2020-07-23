@@ -7,8 +7,8 @@ const path = require('path');
 const maybe = require('call-me-maybe');
 
 // @ts-ignore
-var hljs = require('highlightjs/highlight.pack.js');
-var hlpath = require.resolve('highlightjs/highlight.pack.js').replace('highlight.pack.js', '');
+var hljs = require('highlight.js');
+var hlpath = path.resolve(require.resolve('highlight.js'),'..','..');
 
 const emoji = require('markdown-it-emoji');
 const attrs = require('markdown-it-attrs');
@@ -51,28 +51,30 @@ function safeReadFileSync(filename,encoding) {
 function javascript_include_tag(include) {
     var includeStr = safeReadFileSync(path.join(globalOptions.root, '/source/javascripts/' + include + '.inc'), 'utf8');
     if (globalOptions.minify) {
-        var scripts = [];
+        var scripts = {};
         var includes = includeStr.split('\r').join().split('\n');
         for (var i in includes) {
             var inc = includes[i];
             var elements = inc.split('"');
             if (elements[1]) {
                 if (elements[1] == 'text/javascript') {
-                    scripts.push(path.join(globalOptions.root, 'source/javascripts/all_nosearch.js'));
+                    let scriptName = path.join(globalOptions.root, 'source/javascripts/all_nosearch.js');
+                    scripts[scriptName] = fs.readFileSync(scriptName,'utf8');
                     break;
                 }
                 else {
-                    scripts.push(path.join(globalOptions.root, elements[1]));
+                    let scriptName = path.join(globalOptions.root, elements[1]);
+                    scripts[scriptName] = fs.readFileSync(scriptName,'utf8');
                 }
             }
         }
-        var bundle = uglify.minify(scripts);
+        let bundle = uglify.minify(scripts);
         if (globalOptions.inline) {
             includeStr = '<script>'+bundle.code+'</script>';
         }
         else {
             fs.writeFileSync(path.join(globalOptions.root, '/pub/js/shins.js'), bundle.code, 'utf8');
-            includeStr = safeReadFileSync(path.join(globalOptions.root, '/source/javascripts/' + include + '.bundle.inc'), 'utf8');
+            includeStr = safeReadFileSync(path.join(globalOptions.root, '/source/javascripts/' + (include.replace('_nosearch','')) + '.bundle.inc'), 'utf8');
         }
     }
     return includeStr;
@@ -157,6 +159,9 @@ function language_array(language_tabs) {
 function preProcess(content,options) {
     let lines = content.split('\r').join('').split('\n');
     const comments = [];
+    if (options.header && options.header.generator) {
+      comments.push('<!-- Generator: '+globalOptions.header.generator+' -->');
+    }
     comments.push('<!-- Renderer: Shins v'+globalOptions.shins.version+' -->');
     for (let l=0;l<lines.length;l++) {
         let line = lines[l];
@@ -287,6 +292,7 @@ function render(inputStr, options, callback) {
         }
         var headerStr = inputArr[1];
         var header = yaml.parse(headerStr);
+        globalOptions.header = header;
         if (!header) header = {};
 
         /* non-matching languages between Ruby Rouge and highlight.js at 2016/07/10 are
