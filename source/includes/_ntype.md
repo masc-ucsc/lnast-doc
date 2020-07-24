@@ -462,6 +462,11 @@ auto idx_op5     = lnast->add_child(idx_assign, Lnast_node::create_const (token_
 
 
 #Tuple Statement
+
+The tuple LNAST node first entry always points to a "ref" node. This is the
+destination of the tuple. The following entries point to LNAST nodes that can
+be "assign", "as", "ref", or "const".
+
 ```coffescript
 // Pyrope
 tup = (foo = 1, bar = cat + 2)
@@ -562,14 +567,9 @@ auto idx_op4     = lnast->add_child(idx_assign, Lnast_node::create_ref     (toke
 
 auto idx_tup2    = lnast->add_child(idx_stmts0, Lnast_node::create_tuple   (token_g))
 auto idx_tname   = lnast->add_child(idx_tup2,   Lnast_node::create_ref     (token_h)); //string_view = "___f", for intermediate temp tuple
-auto idx_assign  = lnast->add_child(idx_tup2,   Lnast_node::create_assign  (token_h));
-auto idx_lhs     = lnast->add_child(idx_assign, Lnast_node::create_ref     (token_i)); //string_view = "null"
-auto idx_op7     = lnast->add_child(idx_assign, Lnast_node::create_const   (token_j)); //string_view = "0d4"
+auto idx_op7     = lnast->add_child(idx_tup2  , Lnast_node::create_const   (token_j)); //string_view = "0d4"
 
-auto idx_assign  = lnast->add_child(idx_tup2,   Lnast_node::create_assign  (token_k));
-auto idx_lhs     = lnast->add_child(idx_assign, Lnast_node::create_ref     (token_l)); //string_view = "null"
-auto idx_op8     = lnast->add_child(idx_assign, Lnast_node::create_reg     (token_m)); //string_view = "dog"
-
+auto idx_op8     = lnast->add_child(idx_tup2  , Lnast_node::create_reg     (token_m)); //string_view = "dog"
 
 auto idx_tconcat = lnast->add_child(idx_stmts0,  Lnast_node::create_tuple_concat (token_p)); 
 auto idx_lhs     = lnast->add_child(idx_tconcat, Lnast_node::create_ref    (token_q)); //string_view = "___e"
