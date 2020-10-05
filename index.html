@@ -245,7 +245,7 @@ window.onpopstate = function() {
           </li>
         
           <li>
-            <a href="#function-call" class="toc-h1 toc-link" data-title="Function Call">Function Call</a>
+            <a href="#function-call" class="toc-h1 toc-link" data-title="Function Call">Function Call Statement</a>
             
               <ul class="toc-list-h2">
                 
@@ -264,12 +264,12 @@ window.onpopstate = function() {
           </li>
         
           <li>
-            <a href="#attribute-statement" class="toc-h1 toc-link" data-title="Attribute statement">Attribute statement</a>
+            <a href="#attribute-statement" class="toc-h1 toc-link" data-title="Attribute Statement">Attribute Statement</a>
             
           </li>
         
           <li>
-            <a href="#string-management" class="toc-h1 toc-link" data-title="String management">String management</a>
+            <a href="#string-management" class="toc-h1 toc-link" data-title="String management">String Management</a>
             
           </li>
         
@@ -301,15 +301,16 @@ window.onpopstate = function() {
       <div class="dark-box"></div>
       <div class="content">
         <!-- Renderer: Shins v2.6.0 --><h1 id="introduction">Introduction</h1>
-<p>LNAST stands for Language-Neutral Abstract Syntax Tree, which is constituted of<br>
-Lnast_nodes and indexed by a tree structure.</p>
-<p>Each Lnast_node should has a specific node type and contain the following information from source code tokens<br>
+<p><strong>LNAST</strong> or Language Neutral Abstract Syntax Tree is high-level intermediate representation that helps to bridge different Hardware Description Languages (HDLs) and High-Level Synthesis (HLS) into LiveHD. It is also useful for HDL/C++ code generation.
+<br><br>
+LNAST is comprised of LNAST nodes which are indexed by a tree structure.</p>
+<p>Each LNAST Node should have a specific node-type and contain the following information from source code tokens<br>
 (a) line number<br>
 (b) pos_start, pos_end<br>
 (c) string_view (optional)</p>
 <h2 id="function-overloadings-of-node-data-construction">Function Overloadings of Node Data Construction</h2>
-<p>Every node construction method has four function overloadings.<br>
-For example, to construct a Lnast_node with a type of reference,<br>
+<p>Every LNAST Node constructor method has four function overloadings.<br>
+For example, to construct a LNAST Node with a node-type of <i>reference</i>,<br>
 we could use one of the following functions:</p>
 <pre class="highlight tab tab-cpp"><code><span class="hljs-comment">// C++</span>
 <span class="hljs-keyword">auto</span> node_ref = Lnast_node::create_ref(<span class="hljs-string">&quot;foo&quot;</span>);     
@@ -318,13 +319,13 @@ we could use one of the following functions:</p>
 <span class="hljs-keyword">auto</span> node_ref = Lnast_node::create_ref(token);   
 </code></pre>
 <p>In case (1), you only knows the variable name is &quot;foo&quot;.<br>
-In case (2), you know the variable name and the corresponding line number.<br>
-In case (3), you know the variable name, the line number, and the charactrer position.<br>
-In case (4), you are building LNAST from your HDL AST and you already have the Token.<br>
-The toke should have line number, positions, and string_view information.</p>
+In case (2), you know the variable name and its corresponding line number.<br>
+In case (3), you know the variable name, its line number, and its character position.<br>
+In case (4), you are building LNAST from your HDL AST and you already have the source code token.
+The token should have the line number, positions, and string_view information.</p>
 <h2 id="another-example">Another Example</h2>
-<p>If you don't care the string_view to be stored in the lnast node, just leave it empty for set &quot;foo&quot; for it.
-This is true for many of the operator node, for example, to build a node with type of assign.</p>
+<p>If you omit string_view when constucting a LNAST node, either leave it empty or set it to &quot;foo&quot;.
+This happens frequently for many operations such building a node with node-type of <i>assign</i>.</p>
 <pre class="highlight tab tab-cpp"><code><span class="hljs-comment">// C++</span>
 <span class="hljs-keyword">auto</span> node_assign = Lnast_node::create_assign();   
 <span class="hljs-keyword">auto</span> node_assign = Lnast_node::create_assign(line_num);     
@@ -332,10 +333,10 @@ This is true for many of the operator node, for example, to build a node with ty
 <span class="hljs-keyword">auto</span> node_assign = Lnast_node::create_assign(token); <span class="hljs-comment">// The token is not necessary to have a string_view  </span>
 </code></pre>
 <h1 id="module-input--output--and-register-declaration">Module Input, Output, and Register Declaration</h1>
-<p>In LNAST, all input/output/register are defined in the node type reference
-with differenct prefix of string_view, &quot;$&quot; stands for input, &quot;%&quot; stands for
-output, and &quot;#&quot; stands for register.</p>
+<p>In LNAST, all input, output, and register LNAST Nodes are defined as node-type of <i>reference</i>
+with different prefixes for string_view: <br> &quot;<strong>$</strong>&quot; stands for input <br> &quot;<strong>%</strong>&quot; stands for output <br> &quot;<strong>#</strong>&quot; stands for register</p>
 <h2 id="input">Input</h2>
+<p>Creating and defining an input LNAST Node.</p>
 <pre class="highlight"><code>// Pyrope
 foo = $a
 </code></pre>
@@ -346,6 +347,7 @@ foo = $a
 <span class="hljs-keyword">auto</span> node_input = Lnast_node::create_ref(<span class="hljs-string">&quot;$a&quot;</span>, line_num, pos1, pos2);
 </code></pre>
 <h2 id="output">Output</h2>
+<p>Creating and defining an output LNAST Node.</p>
 <pre class="highlight"><code>// Pyrope
 %out
 </code></pre>
@@ -356,6 +358,7 @@ foo = $a
 <span class="hljs-keyword">auto</span> node_output = Lnast_node::create_ref(<span class="hljs-string">&quot;%out&quot;</span>, line_num, pos1, pos2);
 </code></pre>
 <h2 id="register">Register</h2>
+<p>Creating and defining a register LNAST Node.</p>
 <pre class="highlight"><code>// Pyrope
 #reg_foo
 </code></pre>
@@ -366,17 +369,12 @@ foo = $a
 <span class="hljs-keyword">auto</span> node_reg = Lnast_node::create_ref(<span class="hljs-string">&quot;#reg_foo&quot;</span>, line_num, pos1, pos2);
 </code></pre>
 <h1 id="assign-statement">Assign Statement</h1>
-<p>LNAST has 3 types of assignments. &quot;=&quot;, &quot;as&quot;, and &quot;:=&quot;.</p>
+<p>LNAST has 3 types of <i>assign</i> operations. &quot;<strong>=</strong>&quot;, &quot;<strong>as</strong>&quot;, and &quot;<strong>:=</strong>&quot;.</p>
 <ul>
-<li>The &quot;lhs = rhs&quot; assignment (assign), copies the rhs value to the lhs and makes sure
-that there is no bit drop. The lhs has to have equal or more bits than the
-rhs.</li>
-<li>The &quot;lhs as rhs&quot; assignment (as) is the same as the &quot;=&quot; assignment but it fixes
-the value. The lhs variable becomes a &quot;C++ const&quot; after the assignment. The
-value assigned can not change again.</li>
-<li>the &quot;lhs := rhs&quot; assignment (dp_assign) is like the &quot;=&quot; assignment but there is no check
-for overflow. If the rhs has more bits than the lhs, the upper bits will be
-dropped.</li>
+<li>&quot;lhs <strong>=</strong> rhs&quot; assignment (<i>assign</i>) copies the rhs value to lhs and makes sure
+that there is no bit drop. The lhs must to have equal or more bits than the rhs.</li>
+<li>&quot;lhs <strong>as</strong> rhs&quot; assignment (<i>as</i>) is the same as the &quot;=&quot; assignment, but the value becomes immutable. The lhs variable becomes a &quot;C++ const&quot; after the assignment.</li>
+<li>&quot;lhs <strong>:=</strong> rhs&quot; assignment (<i>dp_assign</i>) is like the &quot;=&quot; assignment, but there is no overflow check. If rhs has more bits than lhs, the upper bits of rhs will be dropped.</li>
 </ul>
 <h2 id="assign-trivial-constant">Assign Trivial Constant</h2>
 <pre class="highlight"><code>// Pyrope
@@ -400,9 +398,8 @@ val = 1023u10bits
 <span class="hljs-keyword">auto</span> idx_target = lnast-&gt;add_child(idx_assign, node_target);
 <span class="hljs-keyword">auto</span> idx_const  = lnast-&gt;add_child(idx_assign, node_const);
 </code></pre>
-<p><img src="source/graphviz/assign_trivial_constant.png" alt="assign">
-An assign node sets the right hand side value to the reference pointed by the left hand side<br>
-of the expression. The left hand side is always a reference. The right hand side is a reference or a constant.</p>
+<p><img src="source/graphviz/assign_trivial_constant.png" alt="assign"><br>
+An <i>assign</i> node sets the value of the right-hand-side to the reference pointed by the left-hand-side of the expression. The left-hand-side is always a node-type of <i>reference</i>. The right hand side is either a node-type of <i>reference</i> or <i>constant</i>.</p>
 <h2 id="assign-simple-expression">Assign Simple Expression</h2>
 <pre class="highlight"><code>// Pyrope
 total := (x - 1) + 3 + 2
@@ -456,10 +453,10 @@ node node_op5    = Lnast_node::create_const     (<span class="hljs-string">&quot
 <span class="hljs-keyword">auto</span> idx_lhs3    = lnast-&gt;add_child(idx_assign, node_lhs3);
 <span class="hljs-keyword">auto</span> idx_op6     = lnast-&gt;add_child(idx_assign, node_op6);        
 </code></pre>
-<p><img src="source/graphviz/assign_simple_expression.png" alt="assign">
-statements that have operations must breakdown the operations per type, and then assign the temporal value to the assign node.</p>
+<p><img src="source/graphviz/assign_simple_expression.png" alt="assign"><br>
+Statements that have multiple operations must break down into operation per type and assign the temporal value to the <i>assign</i> node.</p>
 <h1 id="unary-operation-statement">Unary Operation Statement</h1>
-<p>Unary operator is embedded as the prefix of the variable string_view</p>
+<p>Unary Operator is embedded as the prefix of the variable string_view</p>
 <h2 id="binary-not-operation">Binary Not Operation</h2>
 <pre class="highlight"><code>// Pyrope
 %out = ~$inp
@@ -479,9 +476,8 @@ statements that have operations must breakdown the operations per type, and then
 <span class="hljs-keyword">auto</span> idx_op   = lnast-&gt;add_child(idx_assign, Lnast_node::create_ref(token3)); <span class="hljs-comment">// string_view = $inp       </span>
 </code></pre>
 <p><img src="source/graphviz/inv.png" alt="assign"></p>
+<p> The <i>binary not</i> toggles each bit of the constant number.</p>
 <h2 id="logical-not-operation">Logical Not Operation</h2>
-<p>The not operation can be applied over logical values. Compares the input against zero to be true. The binary not
-just toggles each bit.</p>
 <pre class="highlight"><code>// Pyrope
 %out = !$inp
 </code></pre>
@@ -500,9 +496,10 @@ just toggles each bit.</p>
 <span class="hljs-keyword">auto</span> idx_op   = lnast-&gt;add_child(idx_assign     , Lnast_node::create_ref        (token3)); <span class="hljs-comment">// string_view = $inp       </span>
 </code></pre>
 <p><img src="source/graphviz/logical_inv.png" alt="assign"></p>
+<p>The <i>logical NOT</i> operation can be applied over logical values. It compares the logical value against zero to be true.</p>
 <h1 id="n-ary-operation-statement">N-ary Operation Statement</h1>
-<p>N-ary operation computes n rhs operands and assign the result to the lhs.
-The n-ary operator group includes</p>
+<p>N-ary operations compute <i>n</i> rhs operands and assign the result to lhs.
+The N-ary Operator group includes the following:</p>
 <table>
 <thead>
 <tr>
@@ -573,7 +570,7 @@ The n-ary operator group includes</p>
 </tr>
 </tbody>
 </table>
-<p>We take the &quot;And Operator&quot; for explaination.</p>
+<p>Take the &quot;And Operator&quot; for example.</p>
 <h2 id="and-operation">And Operation</h2>
 <pre class="highlight"><code>// Pyrope
 out = a &amp; b &amp; c
@@ -641,11 +638,11 @@ out = a &amp; b &amp; c
 
 </code></pre>
 <p><img src="source/graphviz/simple_if.png" alt="assign">
-An if-subtree consisted of conditional-statements sub-trees, boolean condition nodes, and statements
-sub-trees in the following order:</p>
-<p>cstmts1 -&gt; condition1 -&gt; stmts1 -&gt; cstmts2 -&gt; condition2 -&gt; stmts2 ...-&gt; stmtsN,</p>
-<p>If there is a final &quot;else&quot; chunk, it won't come with a corresponding conditionial
-statements sub-tree and conditional node, see the figure for the detail.</p>
+An if subtree consists of conditional-statement subtrees, boolean-condition nodes, and statement
+subtrees in the following order:</p>
+<p>cstmts1 -&gt; condition1 -&gt; stmts1 -&gt; cstmts2 -&gt; condition2 -&gt; stmts2 ... -&gt; stmtsN</p>
+<p>If there is a final &quot;else&quot; subtree, it will not come with a corresponding conditional
+statement subtree or a boolean condition node. See the following figure for more details.</p>
 <h2 id="full-case">Full Case</h2>
 <pre class="highlight"><code>// Pyrope
 if a &gt; 10 {
@@ -711,13 +708,9 @@ if a &gt; 10 {
 <span class="hljs-keyword">auto</span> idx_assign  = lnast-&gt;add_child(idx_stmts3, Lnast_node::create_assign(token_n));
 <span class="hljs-keyword">auto</span> idx_lhs     = lnast-&gt;add_child(idx_assign, Lnast_node::create_ref   (token_o)); <span class="hljs-comment">//string_view = &quot;b&quot;</span>
 <span class="hljs-keyword">auto</span> idx_op5     = lnast-&gt;add_child(idx_assign, Lnast_node::create_const (token_p)); <span class="hljs-comment">//string_view = &quot;0d3&quot;</span>
-
 </code></pre>
 <p><img src="source/graphviz/full_case_if.png" alt="assign"></p>
 <h1 id="tuple-statement">Tuple Statement</h1>
-<p>The tuple LNAST node first entry always points to a &quot;ref&quot; node. This is the
-destination of the tuple. The following entries point to LNAST nodes that can
-be &quot;assign&quot;, &quot;as&quot;, &quot;ref&quot;, or &quot;const&quot;.</p>
 <pre class="highlight"><code>// Pyrope
 tup = (foo = 1, bar = cat + 2)
 </code></pre>
@@ -760,6 +753,8 @@ tup_t tup;
 <span class="hljs-keyword">auto</span> idx_op4     = lnast-&gt;add_child(idx_assign, Lnast_node::create_ref     (token_c)); <span class="hljs-comment">//string_view = &quot;___d&quot;</span>
 </code></pre>
 <p><img src="source/graphviz/tuple.png" alt="assign"></p>
+<p>The <i>Tuple</i> LNAST Node's first entry always points to a &quot;ref&quot; node-type. This is the
+  destination of the tuple. The following entries point to LNAST Nodes with node-type of <i>assign</i>, <i>as</i>, <i>ref</i>, or <i>const</i>.</p>
 <h2 id="tuple-concatenation-statement">Tuple Concatenation Statement</h2>
 <pre class="highlight"><code>// Pyrope
 tup = (foo = 1, bar = cat + 2) 
