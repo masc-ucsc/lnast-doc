@@ -333,7 +333,7 @@ This happens frequently for many operations such building a node with node-type 
 <span class="hljs-keyword">auto</span> node_assign = Lnast_node::create_assign(token); <span class="hljs-comment">// The token is not necessary to have a string_view  </span>
 </code></pre>
 <h1 id="module-input--output--and-register-declaration">Module Input, Output, and Register Declaration</h1>
-<p>In LNAST, all input, output, and register LNAST Nodes are defined as node-type of <i>reference</i>
+<p>In LNAST, all input, output, and register LNAST Nodes are the node-type of <i>reference</i>
 with different prefixes for string_view: <br> &quot;<strong>$</strong>&quot; stands for input <br> &quot;<strong>%</strong>&quot; stands for output <br> &quot;<strong>#</strong>&quot; stands for register</p>
 <h2 id="input">Input</h2>
 <p>Creating and defining an input LNAST Node.</p>
@@ -371,10 +371,9 @@ foo = $a
 <h1 id="assign-statement">Assign Statement</h1>
 <p>LNAST has 3 types of <i>assign</i> operations. &quot;<strong>=</strong>&quot;, &quot;<strong>as</strong>&quot;, and &quot;<strong>:=</strong>&quot;.</p>
 <ul>
-<li>&quot;lhs <strong>=</strong> rhs&quot; assignment (<i>assign</i>) copies the rhs value to lhs and makes sure
-that there is no bit drop. The lhs must to have equal or more bits than the rhs.</li>
-<li>&quot;lhs <strong>as</strong> rhs&quot; assignment (<i>as</i>) is the same as the &quot;=&quot; assignment, but the value becomes immutable. The lhs variable becomes a &quot;C++ const&quot; after the assignment.</li>
-<li>&quot;lhs <strong>:=</strong> rhs&quot; assignment (<i>dp_assign</i>) is like the &quot;=&quot; assignment, but there is no overflow check. If rhs has more bits than lhs, the upper bits of rhs will be dropped.</li>
+<li>&quot;<abbr title="Left-hand-side">lhs</abbr> <strong>=</strong> <abbr title="right-hand-side">rhs</abbr>&quot; assignment (<i>assign</i>) copies the value of the rhs to the lhs and makes sure that there is no bit drop. The lhs must have equal or more bits than the rhs.</li>
+<li>&quot;lhs <strong>as</strong> rhs&quot; assignment (<i>as</i>) is the same as the &quot;=&quot; assignment, but the value becomes immutable. The lhs becomes a C++ const after assignment.</li>
+<li>&quot;lhs <strong>:=</strong> rhs&quot; assignment (<i>dp_assign</i>) is like the &quot;=&quot; assignment, but there is no overflow check. If the rhs has more bits than lhs, the upper bits of the rhs will be dropped.</li>
 </ul>
 <h2 id="assign-trivial-constant">Assign Trivial Constant</h2>
 <pre class="highlight"><code>// Pyrope
@@ -399,7 +398,7 @@ val = 1023u10bits
 <span class="hljs-keyword">auto</span> idx_const  = lnast-&gt;add_child(idx_assign, node_const);
 </code></pre>
 <p><img src="source/graphviz/assign_trivial_constant.png" alt="assign"><br>
-An <i>assign</i> node sets the value of the right-hand-side to the reference pointed by the left-hand-side of the expression. The left-hand-side is always a node-type of <i>reference</i>. The right hand side is either a node-type of <i>reference</i> or <i>constant</i>.</p>
+An <i>assign</i> node sets the value of the <abbr title="right-hand-side">rhs</abbr> to the reference pointed by the <abbr title="left-hand-side">lhs</abbr> of the expression. The lhs is always a node-type of <i>reference</i>. The rhs is either ba node-type of <i>reference</i> or <i>constant</i>.</p>
 <h2 id="assign-simple-expression">Assign Simple Expression</h2>
 <pre class="highlight"><code>// Pyrope
 total := (x - 1) + 3 + 2
@@ -476,7 +475,7 @@ Statements that have multiple operations must break down into operation per type
 <span class="hljs-keyword">auto</span> idx_op   = lnast-&gt;add_child(idx_assign, Lnast_node::create_ref(token3)); <span class="hljs-comment">// string_view = $inp       </span>
 </code></pre>
 <p><img src="source/graphviz/inv.png" alt="assign"></p>
-<p> The <i>binary not</i> toggles each bit of the constant number.</p>
+<p> The <i>binary not</i> operation toggles each bit of the constant number.</p>
 <h2 id="logical-not-operation">Logical Not Operation</h2>
 <pre class="highlight"><code>// Pyrope
 %out = !$inp
@@ -498,7 +497,7 @@ Statements that have multiple operations must break down into operation per type
 <p><img src="source/graphviz/logical_inv.png" alt="assign"></p>
 <p>The <i>logical NOT</i> operation can be applied over logical values. It compares the logical value against zero to be true.</p>
 <h1 id="n-ary-operation-statement">N-ary Operation Statement</h1>
-<p>N-ary operations compute <i>n</i> rhs operands and assign the result to lhs.
+<p>N-ary operations compute <i>n</i> <abbr title="right-hand-side">rhs</abbr> operands and assign the result to the <abbr title="left-hand-side">lhs</abbr>.
 The N-ary Operator group includes the following:</p>
 <table>
 <thead>
@@ -565,7 +564,7 @@ The N-ary Operator group includes the following:</p>
 <td style="text-align:center">&gt;=</td>
 </tr>
 <tr>
-<td style="text-align:center">Tuple concatenation</td>
+<td style="text-align:center">Tuple Concatenation</td>
 <td style="text-align:center">++</td>
 </tr>
 </tbody>
@@ -641,8 +640,7 @@ out = a &amp; b &amp; c
 An if subtree consists of conditional-statement subtrees, boolean-condition nodes, and statement
 subtrees in the following order:</p>
 <p>cstmts1 -&gt; condition1 -&gt; stmts1 -&gt; cstmts2 -&gt; condition2 -&gt; stmts2 ... -&gt; stmtsN</p>
-<p>If there is a final &quot;else&quot; subtree, it will not come with a corresponding conditional
-statement subtree or a boolean condition node. See the following figure for more details.</p>
+<p>If there is a final &quot;else&quot; subtree, it will not come with a corresponding conditional-statement subtree or a boolean-condition node. See the following figure for more details.</p>
 <h2 id="full-case">Full Case</h2>
 <pre class="highlight"><code>// Pyrope
 if a &gt; 10 {
@@ -905,10 +903,9 @@ for i in (0..3) {
 <p><img src="source/graphviz/while.png" alt="assign"></p>
 <h1 id="function-definition-statement">Function Definition Statement</h1>
 <h2 id="basic-function-definition">Basic Function Definition</h2>
-<p>A function could be viewed as a module, the arguments of a function represent
-the module IO with the io-prefix, $ for input or % for output.</p>
-<p>In LNAST, a function definition statement is composed as the following node sequence:</p>
-<p>function_name -&gt; condition -&gt; statements(function body) -&gt; io_1 -&gt; io_2 -&gt; io_N ...</p>
+<p>A function can be viewed as a module and the function's arguments represent the module IO with the io-prefixes, <strong>$</strong> for input or <strong>%</strong> for output.</p>
+<p>In LNAST, a <i>function definition</i> statement is composed of the following sequence of subtrees and nodes:</p>
+<p>function_name -&gt; cstmts -&gt; condition -&gt; stmts (function body) -&gt; io_1 -&gt; io_2 -&gt; io_N ...</p>
 <pre class="highlight"><code>// Pyrope
 func_xor = :($a, $b, %out):{
   %out = $a ^ $b
