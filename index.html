@@ -903,9 +903,10 @@ for i in (0..3) {
 <p><img src="source/graphviz/while.png" alt="assign"></p>
 <h1 id="function-definition-statement">Function Definition Statement</h1>
 <h2 id="basic-function-definition">Basic Function Definition</h2>
-<p>A function can be viewed as a module and the function's arguments represent the module IO with the io-prefixes, <strong>$</strong> for input or <strong>%</strong> for output.</p>
+<p>A function can be viewed as a module and the function's arguments represent the module IO with the following IO-prefixes: <strong>$</strong> for input or <strong>%</strong> for output.</p>
 <p>In LNAST, a <i>function definition</i> statement is composed of the following sequence of subtrees and nodes:</p>
-<p>function_name -&gt; cstmts -&gt; condition -&gt; stmts (function body) -&gt; io_1 -&gt; io_2 -&gt; io_N ...</p>
+<p>function_name -&gt; cstmts -&gt; condition -&gt; stmts -&gt; io_1 -&gt; io_2 -&gt; ... -&gt; io_N</p>
+<p>The function body is found in the stmts subtree.</p><br>
 <pre class="highlight"><code>// Pyrope
 func_xor = :($a, $b, %out):{
   %out = $a ^ $b
@@ -954,11 +955,8 @@ func_xor = :($a, $b, %out):{
 </code></pre>
 <p><img src="source/graphviz/function_def.png" alt="assign"></p>
 <h2 id="conditional-function-definition">Conditional Function Definition</h2>
-<p>If the HDL support the conditional function definition, for example, Pyrope, we
-have to assign the appropriate condition variable to the condition node. In the
-example of the following Pyrope code, the func_xor function will only be
-declared when its intput $valid is true. For normal case, we assign &quot;true&quot;
-string_view to this condition node. See figure for better understanding.</p>
+<p>If the HDL you are using supports the <i>conditional function definition</i>, for example, Pyrope, we
+have to assign the appropriate condition variable to the condition node. In the Pyrope code on the right, the func_xor function will only be declared when its input boolean <strong>$valid</strong> is true. For normal cases, we assign &quot;<strong>true</strong>&quot; to the string_view of the condition node. See below for better understanding.</p>
 <pre class="highlight"><code>// Pyrope
 func_xor = :($a, $b, $valid, %out) when $valid:{
   %out = $a ^ $b
@@ -1204,10 +1202,8 @@ my_xor = func_xor(a = $foo, b = $bar)
 <pre class="highlight"><code>// Pyrope
 val = 1023u10bits
 </code></pre>
-<h1 id="attribute-statement">Attribute statement</h1>
-<p>There are two ways to set an attribute to a variable or tuple,
-using &quot;.&quot; dot operator directly or using as (__attr = foo).
-An classical attribute setting is bitwidth assignment.</p>
+<h1 id="attribute-statement">Attribute Statement</h1>
+<p>There are two ways to set an attribute to a variable or tuple: using the dot operation &quot;<strong>.</strong>&quot; directly or using the following format: &quot;(__attr = foo)&quot;. A classic attribute setting is bitwidth assignment.</p>
 <pre class="highlight"><code>// Pyrope
 foo.__bits = 3
 foo = 7
@@ -1269,30 +1265,24 @@ bar = 123
 </code></pre>
 <p><img src="source/graphviz/attribute.png" alt="assign"></p>
 <h1 id="string-management">String management</h1>
-<p>LNAST has to handle lots of strings. Each LNAST node has several strings, for
-example, the simple &quot;ref&quot; node has 2 strings: the variable name and the
-contents.</p>
-<p>The LNAST interface does not allocate strings when passed as arguments. The reason
-is that it accepts std::string_view as argument. The LNAST internals assume that someone
-else handles the string allocations. A code like this will result in incorrect behaviour:</p>
+<p>LNAST handle many strings. Each LNAST Node typical holds several strings. For an example, the simple &quot;ref&quot; node has 2 strings: the variable name and the contents.</p>
+<p>The LNAST interface does not allocate strings when passed in as arguments. Rather, it accepts std::string_view as an argument. The LNAST internal behavior assumes that someone else handles string allocations. The code on the right results in incorrect behavior:</p>
 <pre class="highlight"><code>// WARNING: INCORRECT CODE
 std::string str{&quot;foo&quot;};
 str += &quot;bar&quot;;
 auto Lnast_node::create_ref(str);
 </code></pre>
-<p>The reason is that str is allocated at the stack, and after the function
-returns LNAST will have a pointer to incorrect memory region.</p>
-<p>The solution is that for newly created strings, the &quot;add_string&quot; API must be called.</p>
-<pre class="highlight"><code>// CORRECT CODE to handle strings in LNAST
+<p>Once <strong>str</strong> is initialized and allocated on the stack, it is passed as an argument into a &quot;ref&quot; Node constuctor. Ater the constructor returns, the LNAST Node will have a pointer to an incorrect memory region.</p>
+<p>The solution for this is to call LNAST API function &quot;add_string&quot; for newly created strings.</p>
+<pre class="highlight">
+<code>// CORRECT CODE to handle strings in LNAST
 std::string str{&quot;foo&quot;};
 str += &quot;bar&quot;;
 auto Lnast_node::create_ref(lnast-&gt;add_string(str));
 </code></pre>
-<p>The add_string allocates a string inside lnast. When the lnast is de-allocated
-the string is garbage collected.</p>
+<p>The function &quot;add_string&quot; allocates a string inside LNAST. When the LNAST is deallocated, the string will be deallocated.</p>
 <p>LNAST is optimized to operate with scanner parsers. When LNAST is built, it is possible to
-pass a memory region mmaped with all the strings used by the scanner. In this case, the
-LNAST can get ownership of a large memory region with all the strings used by the scanner.</p>
+pass a memory region mmaped with all the strings used by the scanner. In this case, LNAST can get ownership of a large memory region with all the strings used by the scanner.</p>
 <pre class="highlight"><code>// LNAST mmap support
 std::pair&lt;std::string_view, int&gt; own;
 // own.first points to the mmap region that lnast will munmap at the end
